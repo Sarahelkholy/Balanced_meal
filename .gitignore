@@ -1,0 +1,15 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+pubspec.lock
+build/
+
+# Android / iOS
+android/.gradle/
+android/app/build/
+ios/Pods/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
