@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../hooks/fetch_all_products.dart';
 import '../../../models/product_model.dart';
+import '../../../services/firestore_service.dart';
 import 'product_widget.dart';
 
 class ProductList extends StatelessWidget {
@@ -13,18 +13,31 @@ class ProductList extends StatelessWidget {
 
   final Axis scrollDirection;
   final String categoryFile;
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<ProductModel>>(
-      future: fetchProducts(categoryFile),
+    final firestore = FirestoreService();
+    return StreamBuilder<List<ProductModel>>(
+      stream: firestore.streamProducts(categoryFile),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
+          return const SizedBox(
+            height: 196,
+            child: Center(child: CircularProgressIndicator()),
+          );
         }
-        final products = snapshot.data!;
+        if (snapshot.hasError) {
+          return SizedBox(
+            height: 196,
+            child: Center(child: Text('Error: ${snapshot.error}')),
+          );
+        }
+        final products = snapshot.data ?? [];
+        if (products.isEmpty) {
+          return SizedBox(
+            height: 196,
+            child: Center(child: Text('No items found in $categoryFile')),
+          );
+        }
         return SizedBox(
           height: 196.h,
           child: ListView.separated(
@@ -34,9 +47,7 @@ class ProductList extends StatelessWidget {
             separatorBuilder: (_, __) => SizedBox(width: 16.w),
             itemBuilder: (context, index) {
               final p = products[index];
-              return ProductWidget(
-                product: p,
-              );
+              return ProductWidget(product: p);
             },
           ),
         );

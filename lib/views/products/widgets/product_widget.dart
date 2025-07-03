@@ -19,7 +19,7 @@ class ProductWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ProductsController controller = Get.find();
+    final ProductsController controller = Get.put(ProductsController());
 
     return Container(
       height: 196.h,
